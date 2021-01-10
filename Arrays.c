@@ -48,6 +48,12 @@ void swap (int *arr, int from, int to){
     *(arr + to) = buff;
 }
 
+void swapInt (int *from, int *to){
+    int buff = *from;
+    *from = *to;
+    *to = buff;
+}
+
 void printArr(int *arr, int len, int maxx){
     if (len > maxx)
         len = maxx;
@@ -120,6 +126,93 @@ void QuickSort(long *arr, int len, int min, int globLen){
         *(arr + id1 + i) = arr2[i];
         */
 }
+
+void QuickSortWithHoupAndBlocks(long *arr, int len, int min){
+    if (len <= min) // if there just few numbers left, do other type of sort
+    {
+        insertSort(arr, len);
+        return;
+    }
+    int border = *(arr + rand()%(len)); //selecting random border
+    int id1 = 0; // left-side indicator
+    int id2 = len - 1; // right-side indicator
+    int id3 = 0; // indicator of storage with nums == border
+    for (int i = 0; i < len; i++) // storing numbers equal to border to left side of the arr
+        if (*(arr + i) == border)
+            swapInt((arr + i), (arr + id3++));
+
+    for (id1 = id3; id1 != id2 + 1;) // as elements [0:id3] booked with nums == border, begin sort with id3
+        if (*(arr + id1) > border)
+            swapInt((arr + id1), (arr + id2--));
+        else
+            id1++; // element is already on required side
+
+    for(int i = 0; i < id3; i++) // putting nums == border to the middle of arr
+        if (*(arr + i) !=  *(arr + id1 - i - 1))
+            swapInt((arr + i), (arr + id1 - i - 1)); // the loop lines can be replace by this one, but in many cases this variant is faster
+        else
+            break;
+
+    QuickSortWithHoupAndBlocks(arr, id1 - id3, min); // id1 - id3 is lengh of left-side (without nums == border)
+    QuickSortWithHoupAndBlocks(arr + id1, len - id1, min);
+}
+
+void count_sort_pineapple (int *arr, int len, int const max)
+{
+    int min = find_min(arr, &len);
+    int counts[max - min + 1];
+    for (int i = min; i < max; i++)
+        counts[i - min] = 0;
+    for (int i = 0; i < len; i++)
+        counts[*(arr + i)]++;
+    int ind = 0;
+    for (int i = 0; i < max; i++)
+        while (counts[i] > 0)
+        {
+            *(arr + ind++) = i + min;
+            counts[i]--;
+        }
+}
+
+void block_sort(int *arr, int len){
+    int b = 10;
+    int baskets[b][len + 1];
+    for(int i = 0; i < b; i++)
+        baskets[i][len] = 0;
+    for (int d = 1; d < 1000000; d *= 10)
+    {
+        for ( int i = 0; i < len; i++)
+        {
+            int bask = (*(arr + i) / d) % b;
+            baskets[bask][baskets[bask][len]++] = *(arr + i);
+        }
+        int ind = 0;
+        for (int i = 0; i < b; i++)
+        {
+            for (int t = 0; t < baskets[i][len]; t++)
+                *(arr + ind++) = baskets[i][t];
+            baskets[i][len] = 0;
+        }
+    }
+}
+
+int sumArr(int *arr, int len)
+{
+    int res = 0;
+    for( int i = 0; i < len; i++)
+        res += *(arr + i);
+    return res;
+}
+
+int find_min(int *arr, int *len)
+{
+    int min = *arr;
+    for(int i = 1; i < *len; i++)
+        if (*(arr + i) < min)
+            min = *(arr + i);
+    return min;
+}
+
 /*
 int main(){
     int SIZE = 10000000;
