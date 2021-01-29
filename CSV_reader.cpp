@@ -6,6 +6,7 @@
 #include <ctime>
 #include <chrono>
 #include "DataTools.cpp"
+#include "FileFiller.cpp"
 
 #define BUFF_SIZE 512
 
@@ -59,9 +60,7 @@ int** ReadCSV(char* file_name, char separator = ';', int max_len = -1, int start
         return 0;
 
     while (fscanf(f, "%s", buff) != -1)
-    {
         rows++;
-    }
     fclose(f);
     if (max_len >= 0)
     {
@@ -114,53 +113,31 @@ int** ReadCSV(char* file_name, char separator = ';', int max_len = -1, int start
 
 int main(){
 
-
+    //data::FillFile("Data.csv", 1000000, 10, 10);
+    printf("File is ready\n");
     int** data = ReadCSV("Data.csv",';');
-    printf("%d\n", sizeof(data));
-    int *oneCol[2];
-    oneCol[0] = (int*)calloc(data[0][1],sizeof(int));
-    oneCol[1] = (int*)calloc(data[0][1],sizeof(int));
-    /*
+    printf("%d\n", data[0][3]);
+/*
     for (int i = 1; i < data[0][1] + 1; i++){
         for(int t = 0; t < data[0][0]; t++){
             printf("%3d ",data[i][t]);
         }
         printf("\n");
     }
-    */
+*/
     printf("Done reading\n");
-    for (int i = 0; i < data[0][1]; i ++)
-    {
-        oneCol[0][i] = data[i+1][0];
-        oneCol[1][i] = data[i+1][1];
-    }
-
-    printf("Done splitting\n");
     printf("%d %d\n",
-           SquareErr(oneCol[0], oneCol[1], data[0][1]),
-           MedianErr(oneCol[0], oneCol[1], data[0][1]));
+           SquareErr(data, 0, 1, data[0][1]),
+           MedianErr(data, 0, 1, data[0][1]));
+    printf("Done error mesure\n");
+    int** cm = ConfusionMatrix(data, 0, 1, data[0][1]);
     return 1;
 }
 
 // convert a line to int from the beginning till the first non-numeric value
 
-int fromCharToInt(char* numeric)
-{
-    //char c = numeric[0];
-    int res = 0;
-    /*
-    int i = 0;
 
-
-    while (c >= '0' && c <= '9')
-        c = numeric[++i];
-    i--;
-    int p = 0;
-    */
-    sscanf(numeric, "%d", &res);
-    return res;
-}
-
+/*
 char** splitString(char *str, char sep, int sections, int buff_size)
 {
     char** res;
@@ -183,4 +160,4 @@ char** splitString(char *str, char sep, int sections, int buff_size)
     }
     return res;
 }
-
+*/
